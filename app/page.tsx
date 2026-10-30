@@ -87,9 +87,19 @@ export default function Home() {
               <div style={{ width: "340px", background: "#050505", border: "1px solid var(--line)", padding: "1.25rem", marginTop: "12vh", boxShadow: "0 10px 30px rgba(0,0,0,0.8)" }}>
                 <WaveText text="Full-stack developer and AI engineer. I design applications, agents and automations that save teams time — from prototype to cloud deployment." as="p" className="hero-card-text" trigger={false} delay={0.8} />
                 <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
-                  <button style={{ background: "transparent", color: "#fff", border: "1px solid var(--line)", padding: "0.6rem 1rem", fontFamily: "var(--font-mono)", fontSize: "10px", textTransform: "uppercase", cursor: "pointer", width: "50%" }}>See Projects</button>
-                  <button style={{ background: "#fff", color: "#000", border: "none", padding: "0.6rem 1rem", fontFamily: "var(--font-mono)", fontSize: "10px", textTransform: "uppercase", cursor: "pointer", fontWeight: "bold", width: "50%" }}>Get in Touch &rarr;</button>
-                </div>
+  <button 
+    onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
+    style={{ background: "transparent", color: "#fff", border: "1px solid var(--line)", padding: "0.6rem 1rem", fontFamily: "var(--font-mono)", fontSize: "10px", textTransform: "uppercase", cursor: "pointer", width: "50%" }}
+  >
+    See Projects
+  </button>
+  <button 
+    onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+    style={{ background: "#fff", color: "#000", border: "none", padding: "0.6rem 1rem", fontFamily: "var(--font-mono)", fontSize: "10px", textTransform: "uppercase", cursor: "pointer", fontWeight: "bold", width: "50%" }}
+  >
+    Get in Touch &rarr;
+  </button>
+</div>
               </div>
             </div>
 
