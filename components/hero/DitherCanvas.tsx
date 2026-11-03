@@ -3,7 +3,9 @@ import { useEffect, useRef } from "react";
 
 export default function DitherCanvas({ isHovering }: { isHovering: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouse = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  const mouse = useRef({ x: -1000, y: -1000, tx: -1000, ty: -1000 });
+  
+  const gridDots = useRef<{ x: number, y: number, ox: number, oy: number }[]>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -15,12 +17,11 @@ export default function DitherCanvas({ isHovering }: { isHovering: boolean }) {
     let width = canvas.width = canvas.offsetWidth;
     let height = canvas.height = canvas.offsetHeight;
 
-    const dots: { x: number, y: number, ox: number, oy: number }[] = [];
-    const spacing = 20;
-
+    const spacing = 24;
+    gridDots.current = [];
     for (let x = 0; x < width; x += spacing) {
       for (let y = 0; y < height; y += spacing) {
-        dots.push({ x, y, ox: x, oy: y });
+        gridDots.current.push({ x, y, ox: x, oy: y });
       }
     }
 
@@ -29,36 +30,47 @@ export default function DitherCanvas({ isHovering }: { isHovering: boolean }) {
       mouse.current.tx = e.clientX - rect.left;
       mouse.current.ty = e.clientY - rect.top;
     };
+
+    const onMouseLeave = () => {
+      mouse.current.tx = -1000;
+      mouse.current.ty = -1000;
+    };
+
     window.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseleave", onMouseLeave);
 
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
-      mouse.current.x += (mouse.current.tx - mouse.current.x) * 0.05;
-      mouse.current.y += (mouse.current.ty - mouse.current.y) * 0.05;
+      
+      mouse.current.x += (mouse.current.tx - mouse.current.x) * 0.1;
+      mouse.current.y += (mouse.current.ty - mouse.current.y) * 0.1;
 
-      dots.forEach(dot => {
+      gridDots.current.forEach(dot => {
         const dx = mouse.current.x - dot.ox;
         const dy = mouse.current.y - dot.oy;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const maxDist = 200;
+        
+        // 1. Reduced the radius of the effect (from 220 to 140)
+        const maxDist = 140; 
         
         let targetX = dot.ox;
         let targetY = dot.oy;
 
         if (dist < maxDist && isHovering) {
-          const force = (1 - dist / maxDist);
-          // Reduced scatter force from 80 to 25
-          targetX = dot.ox - (dx / dist) * force * 25;
-          targetY = dot.oy - (dy / dist) * force * 25;
+          const force = Math.pow(1 - dist / maxDist, 2);
+          
+          // 2. Reduced the push strength (from 90 to 45)
+          targetX = dot.ox - (dx / dist) * force * 45;
+          targetY = dot.oy - (dy / dist) * force * 45;
         }
 
-        dot.x += (targetX - dot.x) * 0.1;
-        dot.y += (targetY - dot.y) * 0.1;
+        dot.x += (targetX - dot.x) * 0.12;
+        dot.y += (targetY - dot.y) * 0.12;
 
-        const opacity = Math.min(1, Math.max(0.2, 1 - (dist / maxDist)));
-        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+        ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
         ctx.fillRect(dot.x, dot.y, 2.5, 2.5);
       });
+
       animationFrameId = requestAnimationFrame(draw);
     };
     draw();
@@ -71,6 +83,7 @@ export default function DitherCanvas({ isHovering }: { isHovering: boolean }) {
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseleave", onMouseLeave);
       window.removeEventListener("resize", onResize);
       cancelAnimationFrame(animationFrameId);
     };
