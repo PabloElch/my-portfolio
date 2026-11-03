@@ -1,3 +1,12 @@
-.dot, .ring { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); }
+.dot, .ring { 
+  position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; 
+  transform: translate(-50%, -50%); mix-blend-mode: difference; 
+  transition: background-color 0.2s, border-color 0.2s, opacity 0.2s;
+}
 .dot { width: 4px; height: 4px; background: #fff; border-radius: 50%; }
 .ring { width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+/* Force dark mode for light backgrounds */
+.dark { mix-blend-mode: normal !important; }
+.dot.dark { background: #000 !important; }
+.ring.dark { border-color: #000 !important; }

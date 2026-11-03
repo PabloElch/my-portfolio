@@ -1,11 +1,12 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import styles from "./CustomCursor.module.css";
 
 export default function CustomCursor() {
   const dot = useRef<HTMLDivElement>(null);
   const ring = useRef<HTMLDivElement>(null);
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     if (window.matchMedia("(hover: none)").matches) return;
@@ -17,33 +18,22 @@ export default function CustomCursor() {
     const onMove = (e: MouseEvent) => {
       xTo(e.clientX); yTo(e.clientY);
       rxTo(e.clientX); ryTo(e.clientY);
+      
+      const target = e.target as HTMLElement;
+      if (target) {
+        // Check if the mouse is over an element with data-cursor="dark"
+        const isDarkTarget = target.closest('[data-cursor="dark"]');
+        setIsDark(!!isDarkTarget);
+      }
     };
-
-    // Click physics
-    const onMouseDown = () => {
-      gsap.to(ring.current, { scale: 0.6, duration: 0.2, ease: "power2.out" });
-      gsap.to(dot.current, { scale: 0.5, duration: 0.2, ease: "power2.out" });
-    };
-    const onMouseUp = () => {
-      gsap.to(ring.current, { scale: 1, duration: 0.3, ease: "back.out(2)" });
-      gsap.to(dot.current, { scale: 1, duration: 0.3, ease: "back.out(2)" });
-    };
-
     window.addEventListener("mousemove", onMove);
-    window.addEventListener("mousedown", onMouseDown);
-    window.addEventListener("mouseup", onMouseUp);
-
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
+    return () => window.removeEventListener("mousemove", onMove);
   }, []);
 
   return (
     <>
-      <div ref={dot} className={styles.dot} />
-      <div ref={ring} className={styles.ring} />
+      <div ref={dot} className={`${styles.dot} ${isDark ? styles.dark : ""}`} />
+      <div ref={ring} className={`${styles.ring} ${isDark ? styles.dark : ""}`} />
     </>
   );
 }

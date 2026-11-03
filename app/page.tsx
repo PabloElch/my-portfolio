@@ -84,23 +84,7 @@ export default function Home() {
                 </div>
               </div>
               
-              <div style={{ width: "340px", background: "#050505", border: "1px solid var(--line)", padding: "1.25rem", marginTop: "12vh", boxShadow: "0 10px 30px rgba(0,0,0,0.8)" }}>
-                <WaveText text="Full-stack developer and AI engineer. I design applications, agents and automations that save teams time — from prototype to cloud deployment." as="p" className="hero-card-text" trigger={false} delay={0.8} />
-                <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
-  <button 
-    onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
-    style={{ background: "transparent", color: "#fff", border: "1px solid var(--line)", padding: "0.6rem 1rem", fontFamily: "var(--font-mono)", fontSize: "10px", textTransform: "uppercase", cursor: "pointer", width: "50%" }}
-  >
-    See Projects
-  </button>
-  <button 
-    onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
-    style={{ background: "#fff", color: "#000", border: "none", padding: "0.6rem 1rem", fontFamily: "var(--font-mono)", fontSize: "10px", textTransform: "uppercase", cursor: "pointer", fontWeight: "bold", width: "50%" }}
-  >
-    Get in Touch &rarr;
-  </button>
-</div>
-              </div>
+             <HeroCard />
             </div>
 
             {/* Bottom Bar of Hero */}
@@ -127,5 +111,104 @@ export default function Home() {
 
       </main>
     </>
+  );
+}
+function HeroCard() {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const btn1Ref = useRef<HTMLButtonElement>(null);
+  const btn2Ref = useRef<HTMLButtonElement>(null);
+
+  const cardCenter = useRef({ x: 0, y: 0 });
+  const btn1Center = useRef({ x: 0, y: 0 });
+  const btn2Center = useRef({ x: 0, y: 0 });
+
+  const handleEnter = (e: React.MouseEvent, centerRef: React.MutableRefObject<{x:number, y:number}>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    centerRef.current = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
+    };
+  };
+
+  const handleMove = (e: React.MouseEvent, centerRef: React.MutableRefObject<{x:number, y:number}>, ref: React.RefObject<HTMLElement | null>, strength: number) => {
+    if (!ref.current) return;
+    const x = (e.clientX - centerRef.current.x) * strength;
+    const y = (e.clientY - centerRef.current.y) * strength;
+    gsap.to(ref.current, { x, y, duration: 0.4, ease: "power2.out", overwrite: "auto" });
+  };
+
+  const handleLeave = (ref: React.RefObject<HTMLElement | null>) => {
+    if (!ref.current) return;
+    gsap.to(ref.current, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)", overwrite: "auto" });
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseEnter={(e) => handleEnter(e, cardCenter)}
+      onMouseMove={(e) => handleMove(e, cardCenter, cardRef, 0.05)}
+      onMouseLeave={() => {
+        handleLeave(cardRef);
+        handleLeave(btn1Ref);
+        handleLeave(btn2Ref);
+      }}
+      style={{ 
+        width: "420px", background: "#050505", border: "1px solid var(--line)", 
+        padding: "1.5rem", marginTop: "12vh", boxShadow: "0 10px 30px rgba(0,0,0,0.8)", 
+        cursor: "none" 
+      }}
+    >
+      <p style={{ fontFamily: "var(--font-sans)", fontSize: "12px", lineHeight: 1.6, marginBottom: "1.25rem", margin: 0, color: "var(--fg-dim)" }}>
+        Full-stack developer and AI engineer. I design applications, agents and automations that save teams time — from prototype to cloud deployment.
+      </p>
+      <div style={{ display: "flex", gap: "0.75rem", marginTop: "1.5rem" }}>
+        
+        <button
+          ref={btn1Ref}
+          data-cursor="dark" // <--- ADD THIS
+          onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
+          onMouseEnter={(e) => {
+            handleEnter(e, btn1Center);
+            e.currentTarget.style.background = "#fff";
+            e.currentTarget.style.color = "#000";
+            e.currentTarget.style.borderColor = "#fff";
+          }}
+          onMouseMove={(e) => { e.stopPropagation(); handleMove(e, btn1Center, btn1Ref, 0.2); }}
+          onMouseLeave={(e) => {
+            handleLeave(btn1Ref);
+            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.color = "#fff";
+            e.currentTarget.style.borderColor = "var(--line)";
+          }}
+          style={{ 
+            flex: 1, padding: "0.75rem", border: "1px solid var(--line)", 
+            background: "transparent", color: "#fff", fontFamily: "var(--font-mono)", 
+            fontSize: "10px", textTransform: "uppercase", fontWeight: "bold",
+            transition: "background 0.2s, color 0.2s, border-color 0.2s", cursor: "none"
+          }}
+        >
+          See Projects
+        </button>
+        
+        <button
+          ref={btn2Ref}
+          data-cursor="dark" // <--- ADD THIS
+          onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+          onMouseEnter={(e) => handleEnter(e, btn2Center)}
+          onMouseMove={(e) => { e.stopPropagation(); handleMove(e, btn2Center, btn2Ref, 0.2); }}
+          onMouseLeave={() => handleLeave(btn2Ref)}
+          style={{ 
+            flex: 1, padding: "0.75rem", border: "1px solid #fff", 
+            background: "#fff", color: "#000", fontFamily: "var(--font-mono)", 
+            fontSize: "10px", textTransform: "uppercase", fontWeight: "bold",
+            display: "flex", justifyContent: "center", alignItems: "center", gap: "0.25rem",
+            cursor: "none"
+          }}
+        >
+          Get in Touch &rarr;
+        </button>
+        
+      </div>
+    </div>
   );
 }
