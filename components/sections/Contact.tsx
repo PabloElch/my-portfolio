@@ -54,7 +54,7 @@ export default function Contact() {
             
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "2rem" }}>
               <ContactRow label="EMAIL" value="lencholemessa@gmail.com" href="mailto:lencholemessa@gmail.com" icon={<EmailIcon />} />
-              <ContactRow label="TEL" value="+251 911 234 567" href="tel:+251911234567" icon={<PhoneIcon />} />
+              <ContactRow label="TEL" value="+251 900 52 79 20" href="tel:+251900527920" icon={<PhoneIcon />} />
               <ContactRow label="BASE" value="Jimma, Ethiopia" icon={<MapPinIcon />} />
             </div>
 

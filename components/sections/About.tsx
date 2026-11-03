@@ -70,12 +70,16 @@ export default function About() {
             <ProfileRow label="Focus" value="AI &middot; Automation &middot; Cloud" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <a href="#" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fff", color: "#000", padding: "1rem", textDecoration: "none", fontFamily: "var(--font-mono)", fontSize: "11px", textTransform: "uppercase", fontWeight: "bold" }}>
+            <a href="/resume" target="_blank" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fff", color: "#000", padding: "1rem", textDecoration: "none", fontFamily: "var(--font-mono)", fontSize: "11px", textTransform: "uppercase", fontWeight: "bold" }}>
               <span>View Resume</span><span>&rarr;</span>
             </a>
-            <a href="#" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "transparent", color: "#fff", padding: "1rem", textDecoration: "none", fontFamily: "var(--font-mono)", fontSize: "11px", textTransform: "uppercase", border: "1px solid var(--line)" }}>
-              <span>Download Resume</span><span style={{ fontSize: "9px", color: "var(--fg-dim)" }}>PDF &darr;</span>
-            </a>
+            <a 
+  href="/resume?download=true" 
+  style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "transparent", color: "#fff", padding: "1rem", textDecoration: "none", fontFamily: "var(--font-mono)", fontSize: "11px", textTransform: "uppercase", border: "1px solid var(--line)" }}
+>
+  <span>Download Resume</span>
+  <span style={{ fontSize: "9px", color: "var(--fg-dim)" }}>PDF &darr;</span>
+</a>
           </div>
         </div>
       </div>

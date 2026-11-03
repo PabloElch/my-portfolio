@@ -84,7 +84,7 @@ export default function Home() {
                 </div>
               </div>
               
-             <HeroCard />
+              <HeroCard />
             </div>
 
             {/* Bottom Bar of Hero */}
@@ -113,6 +113,8 @@ export default function Home() {
     </>
   );
 }
+
+// Magnetic Hero Card Component
 function HeroCard() {
   const cardRef = useRef<HTMLDivElement>(null);
   const btn1Ref = useRef<HTMLButtonElement>(null);
@@ -165,7 +167,7 @@ function HeroCard() {
         
         <button
           ref={btn1Ref}
-          data-cursor="dark" // <--- ADD THIS
+          data-cursor="dark"
           onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
           onMouseEnter={(e) => {
             handleEnter(e, btn1Center);
@@ -192,7 +194,7 @@ function HeroCard() {
         
         <button
           ref={btn2Ref}
-          data-cursor="dark" // <--- ADD THIS
+          data-cursor="dark"
           onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
           onMouseEnter={(e) => handleEnter(e, btn2Center)}
           onMouseMove={(e) => { e.stopPropagation(); handleMove(e, btn2Center, btn2Ref, 0.2); }}
