@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 // --- SVG Icons ---
@@ -36,16 +36,21 @@ const TelegramIcon = () => (
   </svg>
 );
 
-export default function Resume() {
+// 1. We move the actual content into its own component
+function ResumeContent() {
   const searchParams = useSearchParams();
   const [isGenerating, setIsGenerating] = useState(false);
+
+  useEffect(() => {
+    document.body.style.backgroundColor = "var(--bg)";
+    return () => { document.body.style.backgroundColor = ""; };
+  }, []);
 
   const handleDownload = async () => {
     const element = document.getElementById("resume-content");
     if (!element) return;
     
     setIsGenerating(true);
-    // Temporarily apply white mode for the PDF
     element.classList.add("pdf-mode");
 
     const html2pdf = (await import("html2pdf.js")).default;
@@ -57,16 +62,13 @@ export default function Resume() {
       html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     }).from(element).save().then(() => {
-      // Revert back to dark mode
       element.classList.remove("pdf-mode");
       setIsGenerating(false);
     });
   };
 
-  // Automatically trigger download if URL has ?download=true
   useEffect(() => {
     if (searchParams.get("download") === "true") {
-      // Small timeout to ensure layout and fonts are fully loaded before generating
       const timer = setTimeout(() => {
         handleDownload();
       }, 500);
@@ -77,7 +79,6 @@ export default function Resume() {
   return (
     <main style={{ backgroundColor: "var(--bg)", minHeight: "100vh", color: "var(--fg)", fontFamily: "var(--font-sans)" }}>
       
-      {/* CSS Overrides for PDF Generation */}
       <style>{`
         .pdf-mode { background-color: #ffffff !important; color: #000000 !important; padding: 2rem !important; }
         .pdf-mode * { color: #000000 !important; border-color: #cccccc !important; }
@@ -86,7 +87,6 @@ export default function Resume() {
         .pdf-mode .print-box { background: transparent !important; border: 1px solid #cccccc !important; }
       `}</style>
 
-      {/* Top Navigation Bar (Hidden on Print) */}
       <div className="no-print" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "2rem var(--gutter)", maxWidth: "1200px", margin: "0 auto" }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.5rem", background: "var(--fg-faint)", border: "1px solid var(--line)", padding: "0.75rem 1.5rem", color: "#fff", textDecoration: "none", fontFamily: "var(--font-mono)", fontSize: "11px", textTransform: "uppercase" }}>
           <span>&larr;</span> Back to Website
@@ -99,12 +99,9 @@ export default function Resume() {
         </div>
       </div>
 
-      {/* Main Resume Container */}
       <div style={{ maxWidth: "1200px", margin: "0 auto", border: "1px solid var(--line)", padding: "4rem", backgroundColor: "var(--bg)" }}>
         
-        {/* We put the ID here so html2pdf only captures the resume itself */}
         <div id="resume-content" style={{ backgroundColor: "var(--bg)" }}>
-          {/* Header Section */}
           <div style={{ borderBottom: "1px solid var(--line)", paddingBottom: "2rem", marginBottom: "3rem" }}>
             <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(3rem, 6vw, 6rem)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 1rem 0", fontWeight: 300, color: "var(--fg)" }}>
               Lencho Lemessa
@@ -114,22 +111,15 @@ export default function Resume() {
             </h2>
             
             <div style={{ display: "flex", flexWrap: "wrap", gap: "2rem", fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--fg)" }}>
-           <a href="tel:+251900527920" style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--fg)", textDecoration: "none" }}>
-  <PhoneIcon /> +251 900 52 79 20
-</a>
-             <a href="mailto:lencholemessa@gmail.com" style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--fg)", textDecoration: "none" }}>
-  <EmailIcon /> LENCHOLEMESSA@GMAIL.COM
-</a>
+              <a href="tel:+251911234567" style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--fg)", textDecoration: "none" }}><PhoneIcon /> +251 911 234 567</a>
+              <a href="mailto:lencholemessa@gmail.com" style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--fg)", textDecoration: "none" }}><EmailIcon /> LENCHOLEMESSA@GMAIL.COM</a>
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}><MapPinIcon /> JIMMA, ETHIOPIA</div>
               <a href="https://github.com/PabloElch" target="_blank" style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--fg)", textDecoration: "none" }}><GithubIcon /> GITHUB</a>
               <a href="https://t.me/rise2power" target="_blank" style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--fg)", textDecoration: "none" }}><TelegramIcon /> TELEGRAM</a>
             </div>
           </div>
 
-          {/* Two Column Layout */}
           <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: "4rem" }}>
-            
-            {/* LEFT COLUMN */}
             <div>
               <div style={{ marginBottom: "3rem" }}>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", textTransform: "uppercase", borderBottom: "1px solid var(--line)", paddingBottom: "1rem", marginBottom: "1.5rem", fontWeight: 400 }}>Profile</h3>
@@ -158,7 +148,6 @@ export default function Resume() {
               </div>
             </div>
 
-            {/* RIGHT COLUMN */}
             <div>
               <div style={{ marginBottom: "3rem" }}>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", textTransform: "uppercase", borderBottom: "1px solid var(--line)", paddingBottom: "1rem", marginBottom: "1.5rem", fontWeight: 400 }}>Skills</h3>
@@ -195,6 +184,16 @@ export default function Resume() {
   );
 }
 
+// 2. Wrap the export in Suspense
+export default function Resume() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: "100vh", backgroundColor: "var(--bg)" }} />}>
+      <ResumeContent />
+    </Suspense>
+  );
+}
+
+// Helper Components
 function ExperienceItem({ title, company, date, bullets }: any) {
   return (
     <div className="print-box" style={{ marginBottom: "2rem", border: "1px solid var(--line)", padding: "1.5rem" }}>
