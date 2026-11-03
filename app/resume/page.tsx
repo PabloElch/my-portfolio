@@ -111,7 +111,7 @@ function ResumeContent() {
             </h2>
             
             <div style={{ display: "flex", flexWrap: "wrap", gap: "2rem", fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--fg)" }}>
-              <a href="tel:+251911234567" style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--fg)", textDecoration: "none" }}><PhoneIcon /> +251 911 234 567</a>
+              <a href="tel:+251900527920" style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--fg)", textDecoration: "none" }}><PhoneIcon /> +251 900 527 920</a>
               <a href="mailto:lencholemessa@gmail.com" style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--fg)", textDecoration: "none" }}><EmailIcon /> LENCHOLEMESSA@GMAIL.COM</a>
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}><MapPinIcon /> JIMMA, ETHIOPIA</div>
               <a href="https://github.com/PabloElch" target="_blank" style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--fg)", textDecoration: "none" }}><GithubIcon /> GITHUB</a>
