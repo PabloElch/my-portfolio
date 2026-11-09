@@ -4,7 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import SmoothScroll from "@/components/providers/SmoothScroll";
 import CustomCursor from "@/components/CustomCursor";
 import "./globals.css";
-
+import AIAssistant from "@/components/AIAssistant";
 export const metadata: Metadata = { title: "Lencho Lemessa", description: "Portfolio" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -13,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <SmoothScroll>
           <CustomCursor />
+             <AIAssistant />
           {children}
         </SmoothScroll>
       </body>

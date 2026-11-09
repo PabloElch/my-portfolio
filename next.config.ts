@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Standard config, no basePath or export
+  serverExternalPackages: ["@xenova/transformers"],
 };
 
 export default nextConfig;
