@@ -3,10 +3,10 @@ import { streamText, convertToModelMessages, UIMessage } from 'ai';
 import { google } from '@ai-sdk/google';
 import { pipeline, env } from '@xenova/transformers';
 
-// ✅ THE FIX: Force WASM and disable local native binaries
+// ✅ CRITICAL FIX FOR VERCEL: Force the WASM backend
 env.allowLocalModels = false;
 env.useBrowserCache = false;
-env.backends.onnx.wasm.numThreads = 1;
+env.backends.setPriority(['wasm', 'cpu']); // This prevents the missing .so file error
 
 export const maxDuration = 30;
 
@@ -28,9 +28,9 @@ export async function POST(req: Request) {
       .join('') || '';
 
     if (!extractor) {
-      console.log("⏳ Loading embedding model on Vercel...");
+      console.log("⏳ Loading embedding model via WASM on Vercel...");
       extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
-      console.log("✅ Model loaded.");
+      console.log("✅ Model loaded successfully.");
     }
 
     // 1. Embed the question
