@@ -19,12 +19,13 @@ export async function POST(req: Request) {
       .map((p: any) => p.text)
       .join('') || '';
 
-    // ✅ FIX: Using the same current, supported model for the search query
+    // 1. Embed the user's question using Google's cloud API
     const { embedding } = await embed({
       model: google.textEmbeddingModel('gemini-embedding-001'),
       value: latestText,
     });
 
+    // 2. Search your Supabase database
     const { data: documents, error } = await supabase.rpc('match_documents', {
       query_embedding: embedding,
       match_threshold: 0.2,
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
 
     const context = (documents || []).map((doc: any) => doc.content).join('\n\n');
 
+    // 3. Generate the response using Gemini
     const result = streamText({
       model: google('gemini-2.5-flash'), 
       system: `You are the AI assistant for Lencho Lemessa's portfolio. 
