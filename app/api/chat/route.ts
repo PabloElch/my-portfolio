@@ -22,17 +22,15 @@ export async function POST(req: Request) {
       .map((p: any) => p.text)
       .join('') || '';
 
-    // 1. Load the local embedding model (cached after first load)
     if (!extractor) {
-      console.log("⏳ Loading embedding model...");
       extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
     }
 
-    // 2. Turn the question into numbers
+    // 1. Embed the question
     const output = await extractor(latestText, { pooling: 'mean', normalize: true });
     const queryEmbedding = Array.from(output.data);
 
-    // 3. Search YOUR database
+    // 2. Search Supabase
     const { data: documents, error } = await supabase.rpc('match_documents', {
       query_embedding: queryEmbedding,
       match_threshold: 0.2,
@@ -42,9 +40,8 @@ export async function POST(req: Request) {
     if (error) throw error;
 
     const context = (documents || []).map((doc: any) => doc.content).join('\n\n');
-    console.log("📚 Context found:", context.substring(0, 100), "...");
 
-    // 4. Generate the response using Google Gemini and STRICT instructions
+    // 3. Generate the response
     const result = streamText({
       model: google('gemini-2.5-flash'), 
       system: `You are the AI assistant for Lencho Lemessa's portfolio. 
@@ -58,11 +55,14 @@ ${context}`,
     });
 
     return result.toUIMessageStreamResponse({
-      onError: (error) => {
+      // FIX: Safely cast the error so TypeScript doesn't complain
+      onError: (error: unknown) => {
         console.error("🔥 Stream Error:", error);
-        return error.message || "Unknown error";
+        const message = error instanceof Error ? error.message : "Unknown error";
+        return message;
       },
     });
+    
   } catch (error: any) {
     console.error('❌ FATAL API ERROR:', error);
     return new Response(JSON.stringify({ error: error.message || "Unknown error" }), { 
