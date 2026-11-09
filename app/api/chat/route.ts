@@ -1,12 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { streamText, convertToModelMessages, UIMessage } from 'ai';
+import { streamText, convertToModelMessages, UIMessage, embed } from 'ai';
 import { google } from '@ai-sdk/google';
-import { pipeline, env } from '@xenova/transformers';
-
-// ✅ CRITICAL FIX FOR VERCEL: Force the WASM backend
-env.allowLocalModels = false;
-env.useBrowserCache = false;
-env.backends.setPriority(['wasm', 'cpu']); // This prevents the missing .so file error
 
 export const maxDuration = 30;
 
@@ -14,8 +8,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
-
-let extractor: any = null;
 
 export async function POST(req: Request) {
   try {
@@ -27,19 +19,14 @@ export async function POST(req: Request) {
       .map((p: any) => p.text)
       .join('') || '';
 
-    if (!extractor) {
-      console.log("⏳ Loading embedding model via WASM on Vercel...");
-      extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
-      console.log("✅ Model loaded successfully.");
-    }
+    // ✅ FIX: Using the same current, supported model for the search query
+    const { embedding } = await embed({
+      model: google.textEmbeddingModel('gemini-embedding-001'),
+      value: latestText,
+    });
 
-    // 1. Embed the question
-    const output = await extractor(latestText, { pooling: 'mean', normalize: true });
-    const queryEmbedding = Array.from(output.data);
-
-    // 2. Search Supabase
     const { data: documents, error } = await supabase.rpc('match_documents', {
-      query_embedding: queryEmbedding,
+      query_embedding: embedding,
       match_threshold: 0.2,
       match_count: 4,
     });
@@ -48,7 +35,6 @@ export async function POST(req: Request) {
 
     const context = (documents || []).map((doc: any) => doc.content).join('\n\n');
 
-    // 3. Generate the response
     const result = streamText({
       model: google('gemini-2.5-flash'), 
       system: `You are the AI assistant for Lencho Lemessa's portfolio. 
