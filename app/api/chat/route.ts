@@ -1,7 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 import { streamText, convertToModelMessages, UIMessage } from 'ai';
 import { google } from '@ai-sdk/google';
-import { pipeline } from '@xenova/transformers';
+import { pipeline, env } from '@xenova/transformers';
+
+// ✅ THE FIX: Force WASM and disable local native binaries
+env.allowLocalModels = false;
+env.useBrowserCache = false;
+env.backends.onnx.wasm.numThreads = 1;
 
 export const maxDuration = 30;
 
@@ -23,7 +28,9 @@ export async function POST(req: Request) {
       .join('') || '';
 
     if (!extractor) {
+      console.log("⏳ Loading embedding model on Vercel...");
       extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+      console.log("✅ Model loaded.");
     }
 
     // 1. Embed the question
@@ -55,11 +62,9 @@ ${context}`,
     });
 
     return result.toUIMessageStreamResponse({
-      // FIX: Safely cast the error so TypeScript doesn't complain
       onError: (error: unknown) => {
         console.error("🔥 Stream Error:", error);
-        const message = error instanceof Error ? error.message : "Unknown error";
-        return message;
+        return error instanceof Error ? error.message : "Unknown error";
       },
     });
     
