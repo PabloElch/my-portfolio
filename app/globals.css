@@ -70,3 +70,10 @@ body {
   animation: blink-dot 1.5s infinite;
   box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
 }
+@keyframes blink-prompt {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.blinking-prompt {
+  animation: blink-prompt 2s step-end infinite;
+}
