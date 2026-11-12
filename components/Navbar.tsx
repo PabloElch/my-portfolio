@@ -5,7 +5,6 @@ export default function Navbar() {
   const [activeSection, setActiveSection] = useState("");
 
   useEffect(() => {
-    // Intersection Observer to track which section is currently in view
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -14,7 +13,7 @@ export default function Navbar() {
           }
         });
       },
-      { rootMargin: "-20% 0px -60% 0px" } // Triggers when the section is roughly in the upper half of the screen
+      { rootMargin: "-20% 0px -60% 0px" }
     );
 
     const sections = ["about", "projects", "lab", "contact"];
@@ -28,9 +27,7 @@ export default function Navbar() {
 
   const handleScroll = (id: string) => {
     const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -82,10 +79,11 @@ function NavLink({ label, active, onClick, align = "left" }: { label: string, ac
         cursor: "pointer",
         textAlign: align,
         transition: "color 0.2s ease",
-        textDecoration: active ? "underline" : "none",
-        textUnderlineOffset: "6px",
+        // Using longhand properties to fix the React warning
+        textDecorationLine: active ? "underline" : "none",
         textDecorationColor: "#fff",
-        textDecorationThickness: "1px"
+        textDecorationThickness: "1px",
+        textUnderlineOffset: "6px"
       }}
       onMouseEnter={(e) => e.currentTarget.style.color = "var(--fg)"}
       onMouseLeave={(e) => e.currentTarget.style.color = active ? "var(--fg)" : "var(--fg-dim)"}

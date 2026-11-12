@@ -1,11 +1,12 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import WaveText from "../WaveText";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// --- SVG Icons ---
 const EmailIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>);
 const PhoneIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>);
 const MapPinIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>);
@@ -16,6 +17,7 @@ const TelegramIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill
 export default function Contact() {
   const containerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -26,6 +28,47 @@ export default function Contact() {
     }, containerRef);
     return () => ctx.revert();
   }, []);
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    
+    // FIX: Save the form element BEFORE the async fetch
+    const formElement = e.currentTarget; 
+    
+    setIsSubmitting(true);
+
+    const formData = new FormData(formElement);
+    
+    // Web3Forms Access Key
+    formData.append("access_key", "af1e0236-60bd-4548-bd07-c1406a21f92d"); 
+
+    const object = Object.fromEntries(formData);
+    const json = JSON.stringify(object);
+
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: json,
+      }).then((res) => res.json());
+
+      if (res.success) {
+        alert("Message sent successfully! Lencho will get back to you soon.");
+        formElement.reset(); // FIX: Use the saved variable instead of e.currentTarget
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred while sending the message.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <section ref={containerRef} style={{ padding: "var(--section-y) var(--gutter)", borderBottom: "1px solid var(--line)", backgroundColor: "var(--bg)", position: "relative", zIndex: 1, overflow: "hidden" }}>
@@ -71,15 +114,36 @@ export default function Contact() {
               <div style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--fg-dim)", textTransform: "uppercase" }}>&gt; NEW_MESSAGE <span className="blinking-cursor">_</span></div>
               <div style={{ color: "var(--fg-dim)" }}>☆</div>
             </div>
-            <form onSubmit={(e) => e.preventDefault()} style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-              <FormGroup num="01" label="NAME" placeholder="Your name" />
-              <FormGroup num="02" label="EMAIL" placeholder="your@email.com" type="email" />
+            <form onSubmit={handleFormSubmit} style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+              
+              <FormGroup name="name" num="01" label="NAME" placeholder="Your name" />
+              <FormGroup name="email" num="02" label="EMAIL" placeholder="your@email.com" type="email" />
+              
               <div>
                 <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--fg-dim)", marginBottom: "1rem" }}>03 &middot; MESSAGE</div>
-                <textarea placeholder="Your message..." rows={4} style={{ width: "100%", background: "transparent", border: "none", borderBottom: "1px solid var(--line)", color: "#fff", fontFamily: "var(--font-sans)", fontSize: "18px", paddingBottom: "1rem", outline: "none", resize: "none" }} />
+                <textarea 
+                  name="message"
+                  placeholder="Your message..." 
+                  rows={4} 
+                  required
+                  style={{ width: "100%", background: "transparent", border: "none", borderBottom: "1px solid var(--line)", color: "#fff", fontFamily: "var(--font-sans)", fontSize: "18px", paddingBottom: "1rem", outline: "none", resize: "none" }} 
+                />
                 <div style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: "10px", color: "var(--fg-dim)", marginTop: "0.5rem" }}>0 / 1000 caractères</div>
               </div>
-              <button type="submit" style={{ background: "#fff", color: "#000", border: "none", padding: "1.25rem", fontFamily: "var(--font-mono)", fontSize: "12px", textTransform: "uppercase", fontWeight: "bold", cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center", gap: "0.5rem", marginTop: "1rem" }}>SEND MESSAGE &rarr;</button>
+              
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                style={{ 
+                  background: "#fff", color: "#000", border: "none", padding: "1.25rem", 
+                  fontFamily: "var(--font-mono)", fontSize: "12px", textTransform: "uppercase", 
+                  fontWeight: "bold", cursor: isSubmitting ? "not-allowed" : "pointer", 
+                  display: "flex", justifyContent: "center", alignItems: "center", gap: "0.5rem", 
+                  marginTop: "1rem", opacity: isSubmitting ? 0.7 : 1 
+                }}
+              >
+                {isSubmitting ? "SENDING..." : "SEND MESSAGE →"}
+              </button>
             </form>
           </div>
         </div>
@@ -101,11 +165,17 @@ function ContactRow({ label, value, href, icon }: { label: string, value: string
   return content;
 }
 
-function FormGroup({ num, label, placeholder, type = "text" }: { num: string, label: string, placeholder: string, type?: string }) {
+function FormGroup({ name, num, label, placeholder, type = "text" }: { name: string, num: string, label: string, placeholder: string, type?: string }) {
   return (
     <div>
       <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--fg-dim)", marginBottom: "1rem" }}>{num} &middot; {label}</div>
-      <input type={type} placeholder={placeholder} style={{ width: "100%", background: "transparent", border: "none", borderBottom: "1px solid var(--line)", color: "#fff", fontFamily: "var(--font-sans)", fontSize: "18px", paddingBottom: "1rem", outline: "none" }} />
+      <input 
+        name={name}
+        type={type} 
+        placeholder={placeholder} 
+        required
+        style={{ width: "100%", background: "transparent", border: "none", borderBottom: "1px solid var(--line)", color: "#fff", fontFamily: "var(--font-sans)", fontSize: "18px", paddingBottom: "1rem", outline: "none" }} 
+      />
     </div>
   );
 }
