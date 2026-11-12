@@ -24,7 +24,26 @@ import WaveText from "@/components/WaveText";
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [isHoveringHero, setIsHoveringHero] = useState(false);
+  const [currentTime, setCurrentTime] = useState("--:--");
   const heroTextRef = useRef<HTMLDivElement>(null);
+
+  // Real-time clock logic
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const formattedTime = now.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+      setCurrentTime(formattedTime);
+    };
+
+    updateTime(); // Initial call
+    const interval = setInterval(updateTime, 1000); // Update every second
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <>
@@ -42,7 +61,7 @@ export default function Home() {
             <div>Lencho<br/>Lemessa</div>
             <div>Jimma, Ethiopia</div>
             <div>AI Automation Developer<br/>Agent Systems / Workflow Engineering</div>
-            <div style={{ textAlign: "right" }}>Local Time<br/>10:35</div>
+            <div style={{ textAlign: "right" }}>Local Time<br/>{currentTime}</div>
           </div>
 
           {/* Hero Section Content */}
