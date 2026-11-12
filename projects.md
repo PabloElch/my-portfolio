@@ -463,7 +463,7 @@ This project demonstrates Lencho's focus on building AI applications that are no
 
 ## Overview
 
-**ScholarshipOS** is an AI-assisted automation concept focused on helping students discover and manage scholarship opportunities.
+**ScholarshipOS** is an AI-assisted automation  focused on helping students discover and manage scholarship opportunities.
 
 The project explores how autonomous agents can reduce the repetitive work involved in searching for opportunities, evaluating eligibility, organizing information, and preparing applications.
 

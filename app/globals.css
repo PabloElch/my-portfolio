@@ -44,3 +44,29 @@ body {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   html { cursor: auto; }
 }
+/* Fix cursor inside the AI Chat */
+.chat-ui, .chat-ui * {
+  cursor: auto !important;
+}
+.chat-ui input, .chat-ui textarea {
+  cursor: text !important;
+}
+.chat-ui button {
+  cursor: pointer !important;
+}
+@keyframes blink-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.blinking-dot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 8px;
+  height: 8px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  animation: blink-dot 1.5s infinite;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+}
